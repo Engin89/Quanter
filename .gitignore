@@ -1,7 +1,4 @@
 *.yml
 papers/
 src/create_logfile.py
-src/utils/*__pycache__/
-src/idea/
-notebooks/.ipynb_checkpoints
-.DS_Store
+.*
