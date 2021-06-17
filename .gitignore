@@ -2,3 +2,4 @@
 papers/
 src/create_logfile.py
 .*
+!/.gitignore
