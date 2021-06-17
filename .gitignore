@@ -3,4 +3,4 @@ papers/
 src/create_logfile.py
 .*
 !/.gitignore
-src/__pycache__/
+src/**/__pycache__/
