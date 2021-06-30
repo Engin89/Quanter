@@ -1,7 +1,8 @@
 #!/bin/sh
 import pandas as pd
 import numpy as np
-from alpha_vantage.timeseries import TimeSeries
+import csv
+import requests
 import time
 import sys
 import json
@@ -30,6 +31,7 @@ tickers = tickers[(tickers['IPO Year'] < 2015) &
                   (tickers['Market Cap'] > 10e8)]
 
 symbols = tickers[tickers['Industry'].isin(tickers.Industry.value_counts()[lambda x: x > 5].index)]['Symbol'].tolist()
+sec_symbol = tickers[tickers['Sector'].isin(tickers.Sector.value_counts()[lambda x: x > 5].index)]['Symbol'].tolist()
 
 # Historical Prices
 return_dict = {}
@@ -45,9 +47,16 @@ for sym in symbols[start:end]:
 
     for i in range(1, 3):
         for j in range(1, 13):
-            ts = TimeSeries(key=apikey, output_format='csv')
-            totalData = ts.get_intraday_extended(symbol=symbol, interval='15min', slice=f'year{i}month{j}')
-            test_data = pd.DataFrame(list(totalData[0]))
+            retrieve = {
+                "function": "TIME_SERIES_INTRADAY_EXTENDED",
+                "symbol": symbol,
+                "apikey": apikey,
+                "slice": f'year{i}month{j}',
+                "interval": "15min"}
+            res = requests.get(api_url, retrieve)
+            decoded_content = res.content.decode('utf-8')
+            cr = csv.reader(decoded_content.splitlines(), delimiter=',')
+            test_data = pd.DataFrame(list(cr))
             cols = test_data.iloc[0].values.tolist()
             test_data.columns = cols
             temp = test_data.iloc[1:]
